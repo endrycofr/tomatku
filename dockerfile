@@ -1,25 +1,15 @@
-FROM python:3.8-slim-buster
+FROM python:3.8
 
-EXPOSE 8501
+# Install required packages
+COPY requirements.txt .
+RUN pip install -r requirements.txt
 
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    software-properties-common \
-    git \
-    && rm -rf /var/lib/apt/lists/*
-
+# Copy the Streamlit app
+COPY . /app
 WORKDIR /app
 
-COPY requirements.txt /app/
+# Expose the port Streamlit runs on
+EXPOSE 8501
 
-# Instal dependensi utama dalam bagian yang lebih kecil
-RUN pip3 install --no-cache-dir streamlit Pillow numpy
-RUN pip3 install --no-cache-dir tensorflow
-
-# Instal sisa dependensi
-RUN pip3 install --no-cache-dir -r requirements.txt
-
-# Salin sisa kode aplikasi
-COPY . /app
-
-ENTRYPOINT ["streamlit", "run", "app.py", "--server.port=8501", "--server.address=0.0.0.0"
+# Run the Streamlit app
+CMD ["streamlit", "run", "app.py", "--server.address=0.0.0.0", "--server.port=8501"]
