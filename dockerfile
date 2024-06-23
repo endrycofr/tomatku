@@ -10,8 +10,16 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /app
 
+COPY requirements.txt /app/
+
+# Instal dependensi utama dalam bagian yang lebih kecil
+RUN pip3 install --no-cache-dir streamlit Pillow numpy
+RUN pip3 install --no-cache-dir tensorflow
+
+# Instal sisa dependensi
+RUN pip3 install --no-cache-dir -r requirements.txt
+
+# Salin sisa kode aplikasi
 COPY . /app
 
-RUN pip3 install -r requirements.txt
-
-ENTRYPOINT ["streamlit", "run", "app.py", "--server.port=8501", "--server.address=0.0.0.0"]
+ENTRYPOINT ["streamlit", "run", "app.py", "--server.port=8501", "--server.address=0.0.0.0"
