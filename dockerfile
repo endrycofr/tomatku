@@ -1,15 +1,17 @@
-FROM python:3.8
+FROM python:3.8-slim-buster
 
-# Install required packages
-COPY requirements.txt .
-RUN pip install -r requirements.txt
-
-# Copy the Streamlit app
-COPY . /app
-WORKDIR /app
-
-# Expose the port Streamlit runs on
 EXPOSE 8501
 
-# Run the Streamlit app
-CMD ["streamlit", "run", "app.py", "--server.address=0.0.0.0", "--server.port=8501"]
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    software-properties-common \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+COPY . /app
+
+RUN pip3 install -r requirements.txt
+
+ENTRYPOINT ["streamlit", "run", "app.py", "--server.port=8501", "--server.address=0.0.0.0"]
