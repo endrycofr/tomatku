@@ -1,25 +1,26 @@
 FROM python:3.8-slim-buster
 
+# Expose the port that Streamlit will run on
 EXPOSE 8501
 
-# Install dependencies
+# Install system dependencies
 RUN apt-get update && apt-get install -y \
     build-essential \
     software-properties-common \
     git \
     && rm -rf /var/lib/apt/lists/*
 
+# Set the working directory
 WORKDIR /app
 
-# Install essential packages first
-COPY requirements-part1.txt /app/
-RUN pip3 install --no-cache-dir -r requirements-part1.txt
+# Copy the requirements file first to leverage Docker cache
+COPY requirements.txt .
 
-# Install remaining packages
-COPY requirements-part2.txt /app/
-RUN pip3 install --no-cache-dir -r requirements-part2.txt
+# Install Python dependencies
+RUN pip3 install --no-cache-dir -r requirements.txt
 
 # Copy the rest of the application code
-COPY . /app
+COPY . .
 
+# Set the entry point to run the Streamlit app
 ENTRYPOINT ["streamlit", "run", "app.py", "--server.port=8501", "--server.address=0.0.0.0"]
