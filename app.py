@@ -6,15 +6,16 @@ import tensorflow as tf
 from keras.utils import img_to_array, load_img
 import os
 
-# Load Model with caching
+# Load TFLite model with caching
 @st.cache_resource
-def load_model(path):
+def load_tflite_model(path):
     try:
-        model = tf.keras.models.load_model(path)
-        print("Model loaded successfully.")
-        return model
+        interpreter = tf.lite.Interpreter(model_path=path)
+        interpreter.allocate_tensors()
+        print("TFLite model loaded successfully.")
+        return interpreter
     except Exception as e:
-        print(f"Failed to load model: {e}")
+        print(f"Failed to load TFLite model: {e}")
         return None
 
 # Treatment suggestions
@@ -63,16 +64,21 @@ def process_image(img_path):
     img = np.expand_dims(img, axis=0)
     return img
 
-def get_prediction(model, image):
-    predictions = model.predict(image)
+def get_tflite_prediction(interpreter, image):
+    input_details = interpreter.get_input_details()
+    output_details = interpreter.get_output_details()
+    
+    interpreter.set_tensor(input_details[0]['index'], image)
+    interpreter.invoke()
+    predictions = interpreter.get_tensor(output_details[0]['index'])
     prediction_index = np.argmax(predictions)
     prediction_label = labels[prediction_index]
     return prediction_label, predictions
 
-# Load Model
-model_path = 'model2.h5'
-model = load_model(model_path)
-if model is None:
+# Load TFLite Model
+tflite_model_path = 'model2.tflite'
+interpreter = load_tflite_model(tflite_model_path)
+if interpreter is None:
     st.stop()
 
 # Labels mapping
@@ -102,7 +108,7 @@ if uploaded_file is not None:
         processed_img = process_image(img_path)
 
         # Get Prediction
-        prediction_label, predictions = get_prediction(model, processed_img)
+        prediction_label, predictions = get_tflite_prediction(interpreter, processed_img)
 
         # Display Results with Styling
         status_html = f'<span style="color:green; font-weight:bold;">The plant is {prediction_label}</span>'
@@ -122,3 +128,5 @@ if uploaded_file is not None:
         st.error(f"An error occurred: {str(e)}")
 else:
     st.info("Please upload an image to get started.")
+
+
