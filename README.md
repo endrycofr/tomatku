@@ -1,5 +1,3 @@
-Berikut adalah README.md yang diperbarui dengan langkah-langkah instalasi yang baru:
-
 ---
 
 # Building a Detection System for Tomato Leaf Disease using AWS Cloud Infrastructure
