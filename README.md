@@ -31,7 +31,7 @@ Tomato leaf diseases can significantly impact crop yield and quality. Early dete
 
 ## Architecture
 
-![Architecture Diagram](C:\Users\User\Downloads\Compressed\tomatku\images\design architecture.jpg)
+![Architecture Diagram](tomatku\images\design_architecture.jpg)
 The system architecture includes:
 
 1. **Image Capture**: Farmers capture images of tomato leaves using a mobile device and upload them via a Streamlit application interface.
